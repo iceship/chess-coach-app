@@ -21,15 +21,6 @@ export default defineNuxtConfig({
     '~/assets/css/main.css'
   ],
 
-  icon: {
-    clientBundle: {
-      scan: true
-    },
-    serverBundle: {
-      collections: ['lucide', 'simple-icons', 'logos']
-    }
-  },
-
   experimental: {
     viewTransition: true
   },
@@ -59,6 +50,15 @@ export default defineNuxtConfig({
         commaDangle: 'never',
         braceStyle: '1tbs'
       }
+    }
+  },
+
+  icon: {
+    clientBundle: {
+      scan: true
+    },
+    serverBundle: {
+      collections: ['lucide', 'simple-icons', 'logos']
     }
   }
 })

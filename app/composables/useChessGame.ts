@@ -75,7 +75,7 @@ export interface ReviewStats {
  */
 function extractMoveAnnotations(pgnText: string): Map<number, MoveClassification> {
   const body = pgnText.replace(/\[[^\]]*\]/g, ' ')
-  const tokens = body.match(/\{[^}]*\}|\$[0-9]+|\d+\.+|[a-zA-Z0-9+=#\-]+/g) || []
+  const tokens = body.match(/\{[^}]*\}|\$[0-9]+|\d+\.+|[a-zA-Z0-9+=#-]+/g) || []
   const map = new Map<number, MoveClassification>()
   let moveIdx = -1
 
@@ -187,7 +187,7 @@ export function useChessGame() {
   /**
    * Makes a move on the board (via drag-and-drop or programmatic input)
    */
-  function makeMove(moveObj: { from: string; to: string; promotion?: string }): boolean {
+  function makeMove(moveObj: { from: string, to: string, promotion?: string }): boolean {
     try {
       const beforeFen = chess.value.fen()
       const moveResult = chess.value.move({
@@ -241,7 +241,7 @@ export function useChessGame() {
   /**
    * Loads a PGN string into the game, extracts metadata headers, and parses all moves
    */
-  function loadPgn(pgnString: string): { success: boolean; error?: string } {
+  function loadPgn(pgnString: string): { success: boolean, error?: string } {
     try {
       const tempChess = new Chess()
       tempChess.loadPgn(pgnString)
@@ -306,9 +306,10 @@ export function useChessGame() {
       reviewStats.value = null
       goToEnd()
       return { success: true }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load PGN:', err)
-      return { success: false, error: err.message || 'Invalid PGN format' }
+      const message = err instanceof Error ? err.message : 'Invalid PGN format'
+      return { success: false, error: message }
     }
   }
 
@@ -421,7 +422,7 @@ export function useChessGame() {
 
     isReviewing.value = true
     try {
-      const res = await $fetch<ReviewStats & { moves: Array<{ index: number; classification: MoveClassification; eval: StockfishEvalResult }> }>('/api/coach/review', {
+      const res = await $fetch<ReviewStats & { moves: Array<{ index: number, classification: MoveClassification, eval: StockfishEvalResult }> }>('/api/coach/review', {
         method: 'POST',
         headers: { [headerName]: csrf },
         body: {

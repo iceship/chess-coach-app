@@ -35,7 +35,13 @@ function handleMove() {
         >
           <UIcon name="i-lucide-bot" class="w-4 h-4" />
           <span>AI Coach</span>
-          <UBadge v-if="coach.isStreaming.value" color="primary" variant="solid" size="xs" class="ml-1 animate-pulse">
+          <UBadge
+            v-if="coach.isStreaming.value"
+            color="primary"
+            variant="solid"
+            size="xs"
+            class="ml-1 animate-pulse"
+          >
             Analyzing
           </UBadge>
         </button>

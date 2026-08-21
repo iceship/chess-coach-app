@@ -59,8 +59,9 @@ export default defineEventHandler(async (event): Promise<GameReviewResponse> => 
           afterFen: after
         }
       })
-    } catch (err: any) {
-      throw createError({ statusCode: 400, statusMessage: `Failed to parse PGN: ${err.message}` })
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Unknown error'
+      throw createError({ statusCode: 400, statusMessage: `Failed to parse PGN: ${message}` })
     }
   }
 

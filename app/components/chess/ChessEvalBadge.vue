@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { EngineSummaryData, MoveClassification, StockfishEvalResult } from '~~/shared/types/chess'
+import type { EngineSummaryData, MoveClassification } from '~~/shared/types/chess'
 
 const props = defineProps<{
   engineSummary?: EngineSummaryData | null
@@ -10,7 +10,7 @@ const classificationConfig = computed(() => {
   const cls = props.engineSummary?.classification
   if (!cls) return null
 
-  const map: Record<MoveClassification, { label: string; color: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'; icon: string }> = {
+  const map: Record<MoveClassification, { label: string, color: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'info', icon: string }> = {
     brilliant: { label: 'Brilliant', color: 'info', icon: 'i-lucide-sparkles' },
     best: { label: 'Best Move', color: 'success', icon: 'i-lucide-star' },
     excellent: { label: 'Excellent', color: 'success', icon: 'i-lucide-check-circle' },

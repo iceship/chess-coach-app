@@ -25,7 +25,7 @@ export interface CoachPromptPayload {
  * Builds a concise, focused AI Chess Coach prompt.
  */
 export function buildCoachPrompt(payload: CoachPromptPayload) {
-  const { fen, userQuestion, playedMove, engineSummary, historyFormatted } = payload
+  const { userQuestion, playedMove, engineSummary, historyFormatted } = payload
   const { eval: currentEval, classification, bestMoveSan, pvSan, turn } = engineSummary
 
   const turnText = turn === 'w' ? 'White (백)' : 'Black (흑)'
@@ -80,8 +80,8 @@ ${historyFormatted ? `- 최근 기보: ${historyFormatted}\n` : ''}
  * Streams AI Coach response from Ollama with generous token buffer.
  */
 export async function streamOllamaChat(
-  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
-  options?: { model?: string; baseUrl?: string; signal?: AbortSignal }
+  messages: Array<{ role: 'system' | 'user' | 'assistant', content: string }>,
+  options?: { model?: string, baseUrl?: string, signal?: AbortSignal }
 ): Promise<ReadableStream<Uint8Array>> {
   const baseUrl = options?.baseUrl || DEFAULT_OLLAMA_URL
   const model = options?.model || DEFAULT_OLLAMA_MODEL

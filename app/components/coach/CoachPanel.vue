@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { UseChessGameReturn } from '~~/app/composables/useChessGame'
-import type { CoachMessage, MoveClassification } from '~~/shared/types/chess'
+import type { MoveClassification } from '~~/shared/types/chess'
 
 const props = defineProps<{
   game: UseChessGameReturn
@@ -60,7 +60,7 @@ const currentBoardTag = computed(() => {
 
 function getClassificationBadge(cls?: MoveClassification) {
   if (!cls) return null
-  const map: Record<MoveClassification, { label: string; color: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'info'; icon: string }> = {
+  const map: Record<MoveClassification, { label: string, color: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'info', icon: string }> = {
     brilliant: { label: 'Brilliant', color: 'info', icon: 'i-lucide-sparkles' },
     best: { label: 'Best Move', color: 'success', icon: 'i-lucide-star' },
     excellent: { label: 'Excellent', color: 'success', icon: 'i-lucide-check-circle' },
@@ -86,7 +86,9 @@ function getClassificationBadge(cls?: MoveClassification) {
         <div>
           <div class="font-bold text-sm text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
             AI Chess Coach
-            <UBadge color="primary" variant="subtle" size="xs">Gemma 4</UBadge>
+            <UBadge color="primary" variant="subtle" size="xs">
+              Gemma 4
+            </UBadge>
           </div>
           <div class="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
             <span>Analyzing:</span>
@@ -142,7 +144,12 @@ function getClassificationBadge(cls?: MoveClassification) {
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2">
-                <UBadge color="neutral" variant="solid" size="sm" class="font-mono font-bold">
+                <UBadge
+                  color="neutral"
+                  variant="solid"
+                  size="sm"
+                  class="font-mono font-bold"
+                >
                   Stockfish {{ msg.engineSummary.eval.scoreFormatted }}
                 </UBadge>
 

@@ -5,16 +5,16 @@
 export type ChessColor = 'w' | 'b'
 export type BoardOrientation = 'white' | 'black'
 
-export type MoveClassification =
-  | 'brilliant'
-  | 'best'
-  | 'excellent'
-  | 'good'
-  | 'book'
-  | 'inaccuracy'
-  | 'mistake'
-  | 'blunder'
-  | 'missed_win'
+export type MoveClassification
+  = | 'brilliant'
+    | 'best'
+    | 'excellent'
+    | 'good'
+    | 'book'
+    | 'inaccuracy'
+    | 'mistake'
+    | 'blunder'
+    | 'missed_win'
 
 export interface StockfishScore {
   type: 'cp' | 'mate'

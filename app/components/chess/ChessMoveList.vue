@@ -47,7 +47,7 @@ function getAnnotationBadge(cls?: MoveClassification) {
 
   const configMap: Record<
     MoveClassification,
-    { label: string; symbol: string; bgClass: string; textClass: string; title: string }
+    { label: string, symbol: string, bgClass: string, textClass: string, title: string }
   > = {
     brilliant: {
       label: 'Brilliant',

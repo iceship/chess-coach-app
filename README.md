@@ -6,6 +6,8 @@
 
 **AI Chess Coach**는 체스 플레이어의 착상과 심리적 의도를 분석하고, 강력한 체스 엔진(Stockfish)의 정밀한 계산과 로컬 LLM(Ollama / Gemma 4)의 친절한 그랜드마스터 코칭을 결합한 **대화형 AI 체스 코칭 웹 애플리케이션**입니다.
 
+> 💡 This project is built upon the official [Nuxt AI Chatbot Template](https://github.com/nuxt-ui-templates/chat).
+
 ---
 
 ## 🌟 핵심 기능 (Key Features)
@@ -15,7 +17,7 @@
   - [Chessground](https://github.com/lichess-org/chessground)와 [chess.js](https://github.com/jhlywa/chess.js)를 결합한 부드러운 드래그 앤 드롭 및 합법적 이동 제한.
   - **PGN 기보 불러오기**: 전체 PGN 텍스트 입력 및 모피의 오페라 게임, 카스파로프 불멸의 대국, 실전 블런더 예제 1클릭 로드.
   - **수순 탐색기 (Move Navigator)**: 처음, 이전 수, 다음 수, 마지막 수 이동 버튼 및 키보드 방향키 탐색 지원.
-  - **기보 목록 (Move History)**: 수순 테이블 제공 (클릭 시 해당 수순의 국면으로 즉시 이동).
+  - **기보 목록 (Move History)**: Chess.com 스타일 수별 평가 뱃지(Blunder, Mistake, Inaccuracy, Best, Miss) 및 국면 이동.
   - **최선수 & 수 등급 시각화**: 스톡피시가 계산한 최선수 화살표(Green Arrow), 마지막 수 하이라이트 및 실시간 형세 게이지.
 - **우측 AI 코치 채팅 패널**:
   - 자연어로 질문 입력 (예: *"여기서 14.Nd4 둔 게 비숍을 공격하려던 건데 왜 블런더야?"*).
@@ -126,3 +128,9 @@ pnpm preview
 - **Chess Engine**: Stockfish 18 (UCI Protocol)
 - **AI / LLM**: Ollama (`gemma4:e4b-mlx`), Vercel AI SDK
 - **Icons & Markdown**: Nuxt Icon, `@comark/nuxt`, Shiki
+
+---
+
+## 👏 Acknowledgments & Credits
+
+This project was built upon the [Nuxt AI Chatbot Template](https://github.com/nuxt-ui-templates/chat) by the Nuxt UI team, extending it with interactive chess board integration ([Chessground](https://github.com/lichess-org/chessground), [chess.js](https://github.com/jhlywa/chess.js)), local Stockfish 18 engine analysis, and local Ollama coaching capabilities.

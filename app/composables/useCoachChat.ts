@@ -137,9 +137,11 @@ export function useCoachChat() {
           }
         }
       }
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        assistantMessage.content += `\n\n*(분석 중 오류가 발생했습니다: ${err.message || '서버 응답 오류'})*`
+    } catch (err: unknown) {
+      const isAbort = err instanceof Error && err.name === 'AbortError'
+      if (!isAbort) {
+        const message = err instanceof Error ? err.message : '서버 응답 오류'
+        assistantMessage.content += `\n\n*(분석 중 오류가 발생했습니다: ${message})*`
       }
     } finally {
       assistantMessage.streaming = false

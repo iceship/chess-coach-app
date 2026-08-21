@@ -35,11 +35,12 @@ export default defineEventHandler(async (event) => {
   let currentEval: StockfishEvalResult
   try {
     currentEval = await runStockfishAnalysis(fen, { depth: 15, timeoutMs: 6000 })
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Stockfish analysis error:', err)
+    const message = err instanceof Error ? err.message : 'Analysis failed'
     throw createError({
       statusCode: 500,
-      statusMessage: `Stockfish engine error: ${err.message || 'Analysis failed'}`
+      statusMessage: `Stockfish engine error: ${message}`
     })
   }
 
@@ -108,10 +109,11 @@ export default defineEventHandler(async (event) => {
         engineSummary,
         coachExplanation: json.message?.content || ''
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'AI Coach generation error'
       throw createError({
         statusCode: 500,
-        statusMessage: `AI Coach generation error: ${err.message}`
+        statusMessage: `AI Coach generation error: ${message}`
       })
     }
   }
@@ -186,9 +188,10 @@ export default defineEventHandler(async (event) => {
         const doneEvent = `event: done\ndata: {}\n\n`
         controller.enqueue(encoder.encode(doneEvent))
         controller.close()
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!abortController.signal.aborted) {
-          const errEvent = `event: error\ndata: ${JSON.stringify({ message: err.message || 'Stream error' })}\n\n`
+          const message = err instanceof Error ? err.message : 'Stream error'
+          const errEvent = `event: error\ndata: ${JSON.stringify({ message })}\n\n`
           controller.enqueue(encoder.encode(errEvent))
           controller.close()
         }

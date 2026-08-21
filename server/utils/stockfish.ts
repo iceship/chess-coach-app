@@ -127,7 +127,7 @@ export async function runStockfishAnalysis(
             const turn = (fenParts[1] || 'w') as ChessColor
 
             // Calculate white perspective score
-            let whiteScoreCp = 0
+            let whiteScoreCp: number
             if (score.type === 'cp') {
               whiteScoreCp = turn === 'w' ? score.value : -score.value
             } else {
@@ -144,7 +144,7 @@ export async function runStockfishAnalysis(
             )
 
             // Format score string
-            let scoreFormatted = '0.0'
+            let scoreFormatted: string
             if (score.type === 'cp') {
               const sign = whiteScoreCp > 0 ? '+' : ''
               scoreFormatted = `${sign}${(whiteScoreCp / 100).toFixed(1)}`
@@ -252,7 +252,7 @@ export function convertPvToSan(fen: string, pvUci: string): string {
 export function classifyMove(
   beforeEval: StockfishEvalResult,
   afterEval: StockfishEvalResult,
-  turn: ChessColor
+  _turn?: ChessColor
 ): MoveClassification {
   // Evaluation before move from player's perspective
   const beforePlayerCp = beforeEval.score.type === 'mate'
