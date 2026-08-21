@@ -23,6 +23,37 @@ html.dark .shiki span {
   text-decoration: var(--shiki-dark-text-decoration) !important;
 }
 
+/* Scrollbar Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+/* Custom sleek slim scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.35);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.65);
+}
+
 /* Chessground Board & Piece Overrides */
 .cg-wrap {
   width: 100%;
@@ -79,4 +110,3 @@ cg-board square.check {
     rgba(185, 28, 28, 0) 100%
   ) !important;
 }
-

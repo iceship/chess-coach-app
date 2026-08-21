@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { UseChessGameReturn } from '~~/app/composables/useChessGame'
+import { useChessSound } from '~~/app/composables/useChessSound'
 
 const props = defineProps<{
   game: UseChessGameReturn
@@ -8,6 +9,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   openPgn: []
 }>()
+
+const { playMove } = useChessSound()
 
 const moveStatusText = computed(() => {
   if (props.game.currentMoveIndex.value === -1) {
@@ -26,6 +29,26 @@ const isAtEnd = computed(() => {
   return props.game.currentMoveIndex.value === props.game.history.value.length - 1
 })
 
+function onPrev() {
+  props.game.prevMove()
+  playMove()
+}
+
+function onNext() {
+  props.game.nextMove()
+  playMove()
+}
+
+function onStart() {
+  props.game.goToStart()
+  playMove()
+}
+
+function onEnd() {
+  props.game.goToEnd()
+  playMove()
+}
+
 // Keyboard navigation listeners
 onMounted(() => {
   const handleKeydown = (e: KeyboardEvent) => {
@@ -36,13 +59,13 @@ onMounted(() => {
     }
 
     if (e.key === 'ArrowLeft') {
-      props.game.prevMove()
+      onPrev()
     } else if (e.key === 'ArrowRight') {
-      props.game.nextMove()
+      onNext()
     } else if (e.key === 'ArrowUp') {
-      props.game.goToStart()
+      onStart()
     } else if (e.key === 'ArrowDown') {
-      props.game.goToEnd()
+      onEnd()
     }
   }
 
@@ -89,7 +112,7 @@ onMounted(() => {
           variant="ghost"
           :disabled="isAtStart"
           aria-label="First move"
-          @click="game.goToStart()"
+          @click="onStart"
         />
         <UButton
           icon="i-lucide-chevron-left"
@@ -98,7 +121,7 @@ onMounted(() => {
           variant="ghost"
           :disabled="isAtStart"
           aria-label="Previous move"
-          @click="game.prevMove()"
+          @click="onPrev"
         />
         <UButton
           icon="i-lucide-chevron-right"
@@ -107,7 +130,7 @@ onMounted(() => {
           variant="ghost"
           :disabled="isAtEnd"
           aria-label="Next move"
-          @click="game.nextMove()"
+          @click="onNext"
         />
         <UButton
           icon="i-lucide-chevrons-right"
@@ -116,7 +139,7 @@ onMounted(() => {
           variant="ghost"
           :disabled="isAtEnd"
           aria-label="Last move"
-          @click="game.goToEnd()"
+          @click="onEnd"
         />
       </div>
 

@@ -68,10 +68,10 @@ sequenceDiagram
      brew install stockfish
      ```
      기본 경로: `/opt/homebrew/bin/stockfish` (환경 변수 `STOCKFISH_PATH`로 변경 가능)
-2. **Ollama & Gemma 4 모델 설치**:
-   - [Ollama](https://ollama.com/) 실행 후 모델 다운로드:
+2. **Ollama & 로컬 LLM 모델 설치**:
+   - [Ollama](https://ollama.com/) 실행 후 모델 준비:
      ```bash
-     ollama run gemma4:e4b-mlx
+     ollama run qwen3.8:27b-mlx
      ```
      (환경 변수 `OLLAMA_BASE_URL` 및 `OLLAMA_MODEL`로 커스텀 설정 가능)
 
@@ -95,7 +95,7 @@ STOCKFISH_PATH=/opt/homebrew/bin/stockfish
 
 # Ollama 엔드포인트 및 모델명
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=gemma4:e4b-mlx
+OLLAMA_MODEL=qwen3.8:27b-mlx
 ```
 
 ### 3. 개발 서버 실행
@@ -123,10 +123,9 @@ pnpm preview
 
 ## 🛠️ 기술 스택 (Tech Stack)
 
-- **Frontend**: Nuxt 4, Vue 3, Nuxt UI v3/v4, Tailwind CSS, `@lichess-org/chessground`, `chess.js`
-- **Backend / API**: Nuxt Nitro, Server-Sent Events (SSE), Node.js `child_process`
-- **Chess Engine**: Stockfish 18 (UCI Protocol)
-- **AI / LLM**: Ollama (`gemma4:e4b-mlx`), Vercel AI SDK
+- **Frontend**: Nuxt 4, Vue 3, Nuxt UI v4, Tailwind CSS, `@lichess-org/chessground`, `chess.js`
+- **Backend / Engine**: Nitro (Server Engine), Stockfish 18 C++ Engine (Native Subprocess / MultiPV 2~3 Analysis)
+- **AI / LLM**: Ollama (`qwen3.8:27b-mlx`), Server-Sent Events (SSE) Streaming
 - **Icons & Markdown**: Nuxt Icon, `@comark/nuxt`, Shiki
 
 ---

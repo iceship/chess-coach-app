@@ -10,21 +10,59 @@ const props = defineProps<{
 const input = ref('')
 const messagesContainer = ref<HTMLElement | null>(null)
 
-const quickPrompts = computed(() => {
+interface QuickPromptItem {
+  label: string
+  icon: string
+  prompt: string
+}
+
+const quickPrompts = computed<QuickPromptItem[]>(() => {
   const currentMove = props.game.playedMove.value
   if (currentMove) {
     return [
-      `여기서 ${currentMove.moveNumber}.${currentMove.san} 둔 게 무엇을 노린 건지 의도를 분석해 주고, 왜 실수/블런더인지 알려줘.`,
-      `이 상황에서 ${currentMove.san} 대신 둘 수 있는 가장 강력한 최선수는 뭐야?`,
-      `상대가 노리고 있는 가장 치명적인 전술적 위협이 뭐야?`,
-      `현재 국면의 형세를 평가하고 장기적인 전략 플랜을 알려줘.`
+      {
+        label: `${currentMove.san} 의도 분석`,
+        icon: 'i-lucide-target',
+        prompt: `여기서 ${currentMove.moveNumber}.${currentMove.san} 둔 게 무엇을 노린 건지 의도를 분석해 줘.`
+      },
+      {
+        label: '최선수 추천',
+        icon: 'i-lucide-sparkles',
+        prompt: `이 상황에서 ${currentMove.san} 대신 둘 수 있는 가장 강력한 최선수는 뭐야?`
+      },
+      {
+        label: '상대 위협 파악',
+        icon: 'i-lucide-shield-alert',
+        prompt: '상대가 노리고 있는 가장 치명적인 전술적 위협이 뭐야?'
+      },
+      {
+        label: '포지션 형세 평가',
+        icon: 'i-lucide-trending-up',
+        prompt: '현재 국면의 형세를 평가하고 전략 플랜을 알려줘.'
+      }
     ]
   }
   return [
-    '이 포지션에서 가장 중요한 전술적/전략적 핵심 포인트가 뭐야?',
-    '현재 차례에서 엔진이 추천하는 최선의 수 3가지는 뭐야?',
-    '킹의 안전도와 기물 활동성을 비교 분석해 줘.',
-    '오프닝/미들게임 원칙에 맞는 최선의 계획을 알려줘.'
+    {
+      label: '핵심 전술 포인트',
+      icon: 'i-lucide-target',
+      prompt: '이 포지션에서 가장 중요한 전술적/전략적 핵심 포인트가 뭐야?'
+    },
+    {
+      label: '추천 최선수 3가지',
+      icon: 'i-lucide-sparkles',
+      prompt: '현재 차례에서 엔진이 추천하는 최선의 수 3가지는 뭐야?'
+    },
+    {
+      label: '킹 안전도 & 활동성',
+      icon: 'i-lucide-shield',
+      prompt: '킹의 안전도와 기물 활동성을 비교 분석해 줘.'
+    },
+    {
+      label: '오프닝/전략 플랜',
+      icon: 'i-lucide-book-open',
+      prompt: '오프닝/미들게임 원칙에 맞는 최선의 계획을 알려줘.'
+    }
   ]
 })
 
@@ -58,52 +96,58 @@ const currentBoardTag = computed(() => {
   return `${move.moveNumber}. ${move.san} (${move.turn === 'w' ? 'White' : 'Black'})`
 })
 
-function getClassificationBadge(cls?: MoveClassification) {
-  if (!cls) return null
-  const map: Record<MoveClassification, { label: string, color: 'primary' | 'success' | 'warning' | 'error' | 'neutral' | 'info', icon: string }> = {
-    brilliant: { label: 'Brilliant', color: 'info', icon: 'i-lucide-sparkles' },
-    best: { label: 'Best Move', color: 'success', icon: 'i-lucide-star' },
-    excellent: { label: 'Excellent', color: 'success', icon: 'i-lucide-check-circle' },
-    good: { label: 'Good Move', color: 'primary', icon: 'i-lucide-thumbs-up' },
-    book: { label: 'Book Move', color: 'neutral', icon: 'i-lucide-book-open' },
-    inaccuracy: { label: 'Inaccuracy', color: 'warning', icon: 'i-lucide-alert-triangle' },
-    mistake: { label: 'Mistake', color: 'warning', icon: 'i-lucide-help-circle' },
-    blunder: { label: 'Blunder', color: 'error', icon: 'i-lucide-x-circle' },
-    missed_win: { label: 'Missed Win', color: 'error', icon: 'i-lucide-heart-crack' }
+function getBadgeColor(cls?: MoveClassification) {
+  switch (cls) {
+    case 'brilliant': return 'info'
+    case 'best': return 'success'
+    case 'excellent': return 'success'
+    case 'good': return 'neutral'
+    case 'inaccuracy': return 'warning'
+    case 'mistake': return 'warning'
+    case 'blunder': return 'error'
+    case 'missed_win': return 'error'
+    default: return 'neutral'
   }
-  return map[cls] || { label: cls, color: 'neutral', icon: 'i-lucide-info' }
 }
 </script>
 
 <template>
-  <div class="h-full flex flex-col bg-neutral-50/50 dark:bg-neutral-950 overflow-hidden">
+  <div class="h-full flex flex-col bg-white dark:bg-neutral-900 overflow-hidden select-none">
     <!-- Header -->
-    <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shrink-0">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-primary-500/10 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold text-sm">
-          ♟️
+        <div class="w-8 h-8 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-500">
+          <UIcon name="i-lucide-bot" class="w-5 h-5" />
         </div>
         <div>
-          <div class="font-bold text-sm text-neutral-900 dark:text-neutral-100 flex items-center gap-1.5">
-            AI Chess Coach
-            <UBadge color="primary" variant="subtle" size="xs">
-              Gemma 4
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-sm text-neutral-900 dark:text-neutral-100">
+              AI Chess Coach
+            </span>
+            <UBadge size="xs" color="primary" variant="subtle">
+              Qwen 3.8 27B (Local)
             </UBadge>
           </div>
-          <div class="text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-1">
-            <span>Analyzing:</span>
-            <span class="font-mono font-medium text-neutral-700 dark:text-neutral-300">{{ currentBoardTag }}</span>
-          </div>
+          <p class="text-[11px] text-neutral-400 dark:text-neutral-500">
+            Stockfish 18 Engine + 심리적 의도 분석
+          </p>
         </div>
       </div>
 
       <div class="flex items-center gap-1">
+        <UBadge
+          variant="outline"
+          color="neutral"
+          size="sm"
+          class="font-mono text-xs"
+        >
+          {{ currentBoardTag }}
+        </UBadge>
         <UButton
           icon="i-lucide-trash-2"
           size="xs"
           color="neutral"
           variant="ghost"
-          label="Clear"
           aria-label="Clear chat"
           @click="coach.clearMessages()"
         />
@@ -113,81 +157,98 @@ function getClassificationBadge(cls?: MoveClassification) {
     <!-- Messages Container -->
     <div
       ref="messagesContainer"
-      class="flex-1 overflow-y-auto p-4 space-y-4"
+      class="flex-1 overflow-y-auto p-4 space-y-4 min-h-0"
     >
+      <!-- Welcome Message if empty -->
+      <div
+        v-if="coach.messages.value.length === 0"
+        class="h-full flex flex-col items-center justify-center text-center p-6 text-neutral-400 dark:text-neutral-500"
+      >
+        <div class="w-14 h-14 rounded-2xl bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-3">
+          <UIcon name="i-lucide-brain" class="w-8 h-8 text-primary-500" />
+        </div>
+        <h3 class="font-bold text-base text-neutral-700 dark:text-neutral-300 mb-1">
+          의도 분석 AI 체스 코치에게 질문해보세요
+        </h3>
+        <p class="text-xs max-w-sm text-neutral-500 dark:text-neutral-400 mb-4 leading-relaxed">
+          체스판에서 기물을 움직이거나 PGN을 불러온 뒤, 왜 이 수를 두었는지 노림수를 질문하시면 스톡피시 분석과 함께 심리적 의도를 코칭해 드립니다.
+        </p>
+
+        <!-- Quick Starter Chips (Grid Layout) -->
+        <div class="grid grid-cols-2 gap-2 w-full max-w-md">
+          <button
+            v-for="(item, idx) in quickPrompts"
+            :key="idx"
+            type="button"
+            class="flex items-center gap-2 p-2.5 rounded-lg border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 transition-colors text-left text-xs text-neutral-700 dark:text-neutral-300 cursor-pointer"
+            @click="sendPrompt(item.prompt)"
+          >
+            <UIcon :name="item.icon" class="w-4 h-4 text-primary-500 shrink-0" />
+            <span class="font-medium truncate">{{ item.label }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Message History -->
       <div
         v-for="msg in coach.messages.value"
         :key="msg.id"
         class="flex flex-col gap-1.5"
-        :class="msg.role === 'user' ? 'items-end' : 'items-start'"
       >
-        <!-- Board Context Pill for User Message -->
+        <!-- User Message -->
         <div
-          v-if="msg.role === 'user' && msg.boardContext?.playedMove"
-          class="text-[11px] text-neutral-400 dark:text-neutral-500 font-mono px-1 flex items-center gap-1"
+          v-if="msg.role === 'user'"
+          class="flex justify-end"
         >
-          <UIcon name="i-lucide-pin" class="w-3 h-3" />
-          Move {{ msg.boardContext.playedMove.moveNumber }}. {{ msg.boardContext.playedMove.san }}
-        </div>
-
-        <!-- Message Bubble -->
-        <div
-          class="max-w-[88%] rounded-2xl p-3.5 shadow-sm text-sm"
-          :class="msg.role === 'user'
-            ? 'bg-primary-600 text-white rounded-tr-none'
-            : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 rounded-tl-none'"
-        >
-          <!-- Assistant Engine Summary Badge -->
-          <div
-            v-if="msg.role === 'assistant' && msg.engineSummary"
-            class="mb-3 p-2.5 rounded-lg bg-neutral-100/80 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700/60 flex flex-col gap-2"
-          >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <UBadge
-                  color="neutral"
-                  variant="solid"
-                  size="sm"
-                  class="font-mono font-bold"
-                >
-                  Stockfish {{ msg.engineSummary.eval.scoreFormatted }}
-                </UBadge>
-
-                <UBadge
-                  v-if="getClassificationBadge(msg.engineSummary.classification)"
-                  :color="getClassificationBadge(msg.engineSummary.classification)!.color"
-                  variant="subtle"
-                  size="xs"
-                  class="font-semibold"
-                >
-                  <UIcon :name="getClassificationBadge(msg.engineSummary.classification)!.icon" class="mr-1 w-3 h-3" />
-                  {{ getClassificationBadge(msg.engineSummary.classification)!.label }}
-                </UBadge>
-              </div>
-
-              <div class="text-[11px] text-neutral-500 font-mono">
-                Best: <span class="text-primary-500 font-bold">{{ msg.engineSummary.bestMoveSan || msg.engineSummary.eval.bestmove }}</span>
-              </div>
-            </div>
-
-            <!-- PV Line -->
-            <div v-if="msg.engineSummary.pvSan" class="text-[11px] text-neutral-500 dark:text-neutral-400 font-mono truncate">
-              Line: {{ msg.engineSummary.pvSan }}
-            </div>
-          </div>
-
-          <!-- Message Text Content -->
-          <div v-if="msg.role === 'user'" class="whitespace-pre-wrap">
+          <div class="max-w-[85%] rounded-2xl rounded-tr-xs bg-primary-600 text-white px-4 py-2.5 text-xs sm:text-sm shadow-xs leading-relaxed">
             {{ msg.content }}
           </div>
+        </div>
 
-          <div v-else class="space-y-2">
-            <!-- Shimmer when thinking and content is empty -->
-            <div v-if="msg.streaming && !msg.content" class="flex items-center gap-2 text-neutral-500 text-xs py-1">
-              <UIcon name="i-lucide-loader" class="w-4 h-4 animate-spin text-primary-500" />
-              <span>체스 엔진과 코치가 국면과 의도를 분석 중입니다...</span>
+        <!-- Assistant Message -->
+        <div
+          v-else
+          class="flex items-start gap-2.5"
+        >
+          <div class="w-7 h-7 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-500 shrink-0 mt-0.5">
+            <UIcon name="i-lucide-bot" class="w-4 h-4" />
+          </div>
+
+          <div class="flex-1 max-w-[90%] space-y-2">
+            <!-- Board Context & Engine Badge -->
+            <div
+              v-if="msg.engineSummary"
+              class="bg-neutral-50 dark:bg-neutral-800/60 rounded-lg p-2.5 border border-neutral-200/80 dark:border-neutral-700/60 text-xs flex flex-col gap-1.5 font-mono"
+            >
+              <div class="flex items-center justify-between font-sans">
+                <div class="flex items-center gap-1.5 font-bold">
+                  <UIcon name="i-lucide-cpu" class="w-3.5 h-3.5 text-primary-500" />
+                  <span>Stockfish Evaluation</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <UBadge
+                    v-if="msg.engineSummary.classification"
+                    :color="getBadgeColor(msg.engineSummary.classification)"
+                    size="xs"
+                    class="capitalize font-sans"
+                  >
+                    {{ msg.engineSummary.classification }}
+                  </UBadge>
+                  <span class="font-bold text-neutral-900 dark:text-neutral-100">
+                    {{ msg.engineSummary.eval.scoreFormatted }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="text-[11px] text-neutral-600 dark:text-neutral-300 flex flex-wrap gap-x-3 gap-y-1">
+                <span>Best: <strong class="text-primary-500">{{ msg.engineSummary.bestMoveSan || msg.engineSummary.eval.bestmove }}</strong></span>
+                <span v-if="msg.engineSummary.pvSan" class="truncate max-w-[280px]">
+                  Line: {{ msg.engineSummary.pvSan }}
+                </span>
+              </div>
             </div>
 
+            <!-- Markdown Content -->
             <ChatComark
               v-if="msg.content"
               :value="msg.content"
@@ -198,21 +259,19 @@ function getClassificationBadge(cls?: MoveClassification) {
       </div>
     </div>
 
-    <!-- Quick Prompts Chips -->
-    <div class="px-4 py-2 bg-neutral-100/60 dark:bg-neutral-900/40 border-t border-neutral-200/60 dark:border-neutral-800/60 overflow-x-auto flex gap-2 shrink-0 no-scrollbar">
-      <UButton
-        v-for="(prompt, idx) in quickPrompts"
+    <!-- Quick Prompts Chips (Wrapped without horizontal scroll) -->
+    <div class="px-3 py-1.5 bg-neutral-50 dark:bg-neutral-900/60 border-t border-neutral-200/60 dark:border-neutral-800/60 flex flex-wrap gap-1.5 shrink-0">
+      <button
+        v-for="(item, idx) in quickPrompts"
         :key="idx"
-        size="xs"
-        color="neutral"
-        variant="outline"
-        class="rounded-full shrink-0 text-xs font-normal"
+        type="button"
+        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors shadow-2xs cursor-pointer disabled:opacity-50"
         :disabled="coach.isStreaming.value"
-        @click="sendPrompt(prompt)"
+        @click="sendPrompt(item.prompt)"
       >
-        <UIcon name="i-lucide-sparkles" class="text-primary-500 w-3 h-3 mr-1" />
-        {{ prompt.length > 30 ? prompt.slice(0, 30) + '...' : prompt }}
-      </UButton>
+        <UIcon :name="item.icon" class="text-primary-500 w-3 h-3" />
+        <span>{{ item.label }}</span>
+      </button>
     </div>
 
     <!-- Input Footer -->

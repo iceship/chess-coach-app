@@ -57,8 +57,6 @@ export default defineNuxtConfig({
     clientBundle: {
       scan: true
     },
-    serverBundle: {
-      collections: ['lucide', 'simple-icons', 'logos']
-    }
+    serverBundle: 'auto'
   }
 })

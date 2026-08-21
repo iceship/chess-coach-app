@@ -4,6 +4,7 @@ import type { Api } from '@lichess-org/chessground/api'
 import type { Config } from '@lichess-org/chessground/config'
 import type { Key } from '@lichess-org/chessground/types'
 import type { UseChessGameReturn } from '~~/app/composables/useChessGame'
+import { useChessSound } from '~~/app/composables/useChessSound'
 
 const props = defineProps<{
   game: UseChessGameReturn
@@ -15,6 +16,7 @@ const emit = defineEmits<{
 
 const boardContainer = ref<HTMLElement | null>(null)
 let cg: Api | null = null
+const { playMove } = useChessSound()
 
 function updateBoard() {
   if (!cg) return
@@ -69,6 +71,7 @@ function initChessground() {
         after: (orig: Key, dest: Key) => {
           const success = props.game.makeMove({ from: orig, to: dest })
           if (success) {
+            playMove()
             emit('move', orig, dest)
           }
           updateBoard()
@@ -120,10 +123,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="relative w-full max-w-[540px] mx-auto aspect-square flex items-center justify-center p-2">
-    <div
-      ref="boardContainer"
-      class="w-full h-full shadow-lg rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900"
+  <div class="relative w-full max-w-[540px] mx-auto flex items-stretch justify-center p-1 sm:p-2 gap-2 select-none">
+    <!-- Vertical Real-time Eval Bar (Chess.com Style) -->
+    <ChessEvalBar
+      :engine-eval="game.engineEval.value"
+      :orientation="game.orientation.value"
+      :loading="game.isEngineEvaluating.value"
     />
+
+    <!-- Chessground Board Container (Enforces strict 1:1 square aspect ratio) -->
+    <div class="flex-1 max-w-[480px] aspect-square relative">
+      <div
+        ref="boardContainer"
+        class="w-full h-full shadow-lg rounded-lg overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-900 aspect-square"
+      />
+    </div>
   </div>
 </template>

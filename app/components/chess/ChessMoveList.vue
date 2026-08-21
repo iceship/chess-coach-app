@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import type { UseChessGameReturn } from '~~/app/composables/useChessGame'
 import type { MoveClassification } from '~~/shared/types/chess'
+import { useChessSound } from '~~/app/composables/useChessSound'
 
 const props = defineProps<{
   game: UseChessGameReturn
 }>()
+
+const { playMove } = useChessSound()
+
+function onSelectMove(idx: number) {
+  props.game.goToMove(idx)
+  playMove()
+}
 
 interface MovePair {
   moveNumber: number
@@ -163,7 +171,7 @@ watch(() => props.game.currentMoveIndex.value, (idx) => {
             :class="game.currentMoveIndex.value === pair.white.index
               ? 'bg-primary-500 text-white dark:bg-primary-600 font-bold shadow-xs'
               : 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700/70'"
-            @click="game.goToMove(pair.white.index)"
+            @click="onSelectMove(pair.white.index)"
           >
             <span class="truncate">{{ pair.white.san }}</span>
 
@@ -193,7 +201,7 @@ watch(() => props.game.currentMoveIndex.value, (idx) => {
             :class="game.currentMoveIndex.value === pair.black.index
               ? 'bg-primary-500 text-white dark:bg-primary-600 font-bold shadow-xs'
               : 'text-neutral-700 dark:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700/70'"
-            @click="game.goToMove(pair.black.index)"
+            @click="onSelectMove(pair.black.index)"
           >
             <span class="truncate">{{ pair.black.san }}</span>
 

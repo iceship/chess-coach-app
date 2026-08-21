@@ -131,18 +131,21 @@ const matchInfo = computed(() => {
       </div>
     </div>
 
-    <!-- Main board container -->
-    <div class="flex-1 flex flex-col items-center justify-center p-2 gap-1 min-h-0 overflow-y-auto">
-      <!-- Chessboard -->
+    <!-- Main board container (clean layout without nested scrollbars) -->
+    <div class="flex-1 flex flex-col items-center p-2 gap-2 min-h-0">
+      <!-- Chessboard with integrated vertical Eval Bar -->
       <ChessBoard
         :game="game"
         @move="(from, to) => emit('move', from, to)"
       />
 
-      <!-- Engine evaluation badge -->
-      <ChessEvalBadge
-        :engine-summary="engineSummary"
-        :loading="loading"
+      <!-- Real-time Multi-Line Engine Evaluation (Chess.com Style evaluation-lines-lines) -->
+      <ChessEvalLines
+        :engine-eval="game.engineEval.value"
+        :loading="game.isEngineEvaluating.value"
+        :multipv="game.multipv.value"
+        @update:multipv="game.setMultipv($event)"
+        @hover-move="game.setHoverArrow($event)"
       />
 
       <!-- Navigation & Controls -->

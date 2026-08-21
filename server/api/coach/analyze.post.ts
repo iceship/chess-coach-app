@@ -1,8 +1,10 @@
 import { z } from 'zod'
 import type { ChessColor, EngineSummaryData, MoveClassification, StockfishEvalResult } from '~~/shared/types/chess'
+import { classifyMove, convertPvToSan, convertUciToSan, runStockfishAnalysis } from '~~/server/utils/stockfish'
+import { buildCoachPrompt, streamOllamaChat } from '~~/server/utils/ollama'
 
-const requestSchema = z.object({
-  fen: z.string(),
+const analyzeRequestSchema = z.object({
+  fen: z.string().min(1),
   playedMove: z.object({
     san: z.string().optional(),
     uci: z.string().optional(),
@@ -14,27 +16,27 @@ const requestSchema = z.object({
     beforeFen: z.string().optional(),
     afterFen: z.string().optional()
   }).optional(),
-  userQuestion: z.string().default('이 수의 의도와 국면을 분석해 줘.'),
+  userQuestion: z.string().min(1),
   history: z.array(z.object({
     moveNumber: z.number(),
     turn: z.enum(['w', 'b']),
     san: z.string()
   })).optional(),
   pgn: z.string().optional(),
-  stream: z.boolean().default(true)
+  stream: z.boolean().optional().default(true)
 })
 
 export default defineEventHandler(async (event) => {
-  const body = await readValidatedBody(event, requestSchema.parse)
+  const body = await readValidatedBody(event, analyzeRequestSchema.parse)
   const { fen, playedMove, userQuestion, history } = body
 
   const fenParts = fen.trim().split(' ')
   const turn = (fenParts[1] || 'w') as ChessColor
 
-  // 1. Run Stockfish evaluation on current position
+  // 1. Run Stockfish evaluation on current position (after the move / side to move now)
   let currentEval: StockfishEvalResult
   try {
-    currentEval = await runStockfishAnalysis(fen, { depth: 15, timeoutMs: 6000 })
+    currentEval = await runStockfishAnalysis(fen, { depth: 16, timeoutMs: 7000 })
   } catch (err: unknown) {
     console.error('Stockfish analysis error:', err)
     const message = err instanceof Error ? err.message : 'Analysis failed'
@@ -44,35 +46,47 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // 2. Evaluate before position if playedMove has beforeFen for accurate move classification
+  // 2. If playedMove is provided, evaluate the position BEFORE the move to find the player's alternatives
   let beforeEval: StockfishEvalResult | undefined
   let classification: MoveClassification | undefined
+  let playerBestMoveSan: string | undefined
+  const playerTurn = (playedMove?.turn || (turn === 'w' ? 'b' : 'w')) as ChessColor
 
   if (playedMove?.beforeFen && playedMove.beforeFen !== fen) {
     try {
-      beforeEval = await runStockfishAnalysis(playedMove.beforeFen, { depth: 14, timeoutMs: 5000 })
-      const moveTurn = (playedMove.turn || (turn === 'w' ? 'b' : 'w')) as ChessColor
-      classification = classifyMove(beforeEval, currentEval, moveTurn)
+      beforeEval = await runStockfishAnalysis(playedMove.beforeFen, { depth: 15, timeoutMs: 6000 })
+      playerBestMoveSan = beforeEval.bestmoveSan || (beforeEval.bestmove ? convertUciToSan(playedMove.beforeFen, beforeEval.bestmove) : undefined)
+      classification = classifyMove(beforeEval, currentEval, playerTurn)
+
+      // If user move matches engine best move, ensure it is classified as best
+      if (playedMove.san && playerBestMoveSan && playedMove.san === playerBestMoveSan) {
+        classification = 'best'
+      }
     } catch (err) {
       console.warn('Could not evaluate beforeFen for move classification:', err)
     }
   }
 
-  // 3. Convert best move and PV to SAN
-  const bestMoveSan = currentEval.bestmove ? convertUciToSan(fen, currentEval.bestmove) : undefined
-  const pvSan = currentEval.pv ? convertPvToSan(fen, currentEval.pv) : undefined
+  // Opponent's best response in current position
+  const opponentBestResponseSan = currentEval.bestmoveSan || (currentEval.bestmove ? convertUciToSan(fen, currentEval.bestmove) : undefined)
+  const currentPvSan = currentEval.pv ? convertPvToSan(fen, currentEval.pv) : undefined
 
+  // 3. Assemble engine summary
   const engineSummary: EngineSummaryData = {
     eval: currentEval,
     classification,
     beforeEval,
     playedMoveSan: playedMove?.san,
-    bestMoveSan,
-    pvSan,
-    turn
+    playerBestMoveSan,
+    opponentBestResponseSan,
+    bestMoveSan: playerBestMoveSan || currentEval.bestmoveSan,
+    pvSan: currentPvSan,
+    turn,
+    playerTurn,
+    lines: currentEval.lines
   }
 
-  // 4. Format history
+  // 4. Format recent history
   let historyFormatted = ''
   if (history && history.length > 0) {
     const recentMoves = history.slice(-10)
@@ -95,7 +109,7 @@ export default defineEventHandler(async (event) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: process.env.OLLAMA_MODEL || 'gemma4:e4b-mlx',
+          model: process.env.OLLAMA_MODEL || 'qwen3.8:27b-mlx',
           messages: [
             { role: 'system', content: systemInstructions },
             { role: 'user', content: promptContent }

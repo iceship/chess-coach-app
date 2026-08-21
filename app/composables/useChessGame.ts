@@ -4,6 +4,7 @@ import type {
   BoardOrientation,
   ChessColor,
   ChessGameHeaders,
+  EngineLine,
   MoveClassification,
   MoveHistoryItem,
   PlayedMoveInfo,
@@ -126,10 +127,14 @@ export function useChessGame() {
   const currentMoveIndex = ref<number>(-1)
   const headers = ref<ChessGameHeaders>({})
   const engineEval = ref<StockfishEvalResult | null>(null)
+  const multipv = ref(2)
+  const isEngineEvaluating = ref(false)
+  const autoEvaluate = ref(true)
   const isAnalyzing = ref(false)
   const isReviewing = ref(false)
   const reviewStats = ref<ReviewStats | null>(null)
-  const arrows = ref<ChessArrowShape[]>([])
+  const bestMoveArrow = ref<ChessArrowShape | null>(null)
+  const hoverArrow = ref<ChessArrowShape | null>(null)
 
   const { csrf, headerName } = useCsrf()
 
@@ -142,6 +147,20 @@ export function useChessGame() {
   const isCheckmate = computed(() => chess.value.isCheckmate())
   const isDraw = computed(() => chess.value.isDraw())
   const isGameOver = computed(() => chess.value.isGameOver())
+
+  const arrows = computed<ChessArrowShape[]>(() => {
+    const list: ChessArrowShape[] = []
+    if (hoverArrow.value) {
+      list.push(hoverArrow.value)
+    } else if (bestMoveArrow.value) {
+      list.push(bestMoveArrow.value)
+    }
+    return list
+  })
+
+  const evalLines = computed<EngineLine[]>(() => {
+    return engineEval.value?.lines || []
+  })
 
   const playedMove = computed<PlayedMoveInfo | null>(() => {
     if (currentMoveIndex.value < 0 || currentMoveIndex.value >= history.value.length) {
@@ -228,8 +247,9 @@ export function useChessGame() {
       history.value.push(historyItem)
       currentMoveIndex.value = history.value.length - 1
 
-      // Clear previous best move arrows
-      arrows.value = []
+      // Reset arrows
+      bestMoveArrow.value = null
+      hoverArrow.value = null
 
       return true
     } catch (err) {
@@ -324,7 +344,8 @@ export function useChessGame() {
       headers.value = {}
       reviewStats.value = null
       currentMoveIndex.value = -1
-      arrows.value = []
+      bestMoveArrow.value = null
+      hoverArrow.value = null
       return true
     } catch (err) {
       console.error('Invalid FEN:', err)
@@ -342,7 +363,8 @@ export function useChessGame() {
     headers.value = {}
     reviewStats.value = null
     currentMoveIndex.value = -1
-    arrows.value = []
+    bestMoveArrow.value = null
+    hoverArrow.value = null
     engineEval.value = null
   }
 
@@ -372,7 +394,8 @@ export function useChessGame() {
       }
     }
 
-    arrows.value = []
+    bestMoveArrow.value = null
+    hoverArrow.value = null
   }
 
   function goToStart() {
@@ -396,23 +419,81 @@ export function useChessGame() {
   }
 
   /**
-   * Sets arrow shapes on the board (e.g. for best move or blunder visualization)
+   * Sets arrow shapes on the board for the best move
    */
   function setBestMoveArrow(bestMoveUci?: string) {
     if (!bestMoveUci || bestMoveUci.length < 4) {
-      arrows.value = []
+      bestMoveArrow.value = null
       return
     }
     const orig = bestMoveUci.slice(0, 2) as Key
     const dest = bestMoveUci.slice(2, 4) as Key
-    arrows.value = [
-      {
-        orig,
-        dest,
-        brush: 'green'
-      }
-    ]
+    bestMoveArrow.value = { orig, dest, brush: 'green' }
   }
+
+  /**
+   * Sets preview hover arrow for MultiPV lines
+   */
+  function setHoverArrow(uci?: string) {
+    if (!uci || uci.length < 4) {
+      hoverArrow.value = null
+      return
+    }
+    const orig = uci.slice(0, 2) as Key
+    const dest = uci.slice(2, 4) as Key
+    hoverArrow.value = { orig, dest, brush: 'blue' }
+  }
+
+  /**
+   * Real-time MultiPV evaluation triggered automatically per turn
+   */
+  let evalTimeout: ReturnType<typeof setTimeout> | null = null
+
+  async function triggerLiveEvaluation(targetFen?: string) {
+    const currentFen = targetFen || fen.value
+    if (!autoEvaluate.value) return
+
+    isEngineEvaluating.value = true
+    try {
+      const res = await $fetch<{ eval: StockfishEvalResult }>('/api/coach/eval', {
+        params: {
+          fen: currentFen,
+          depth: 16,
+          multipv: multipv.value
+        }
+      })
+
+      if (fen.value === currentFen) {
+        engineEval.value = res.eval
+        if (res.eval.bestmove) {
+          setBestMoveArrow(res.eval.bestmove)
+        }
+      }
+    } catch (err) {
+      console.warn('Live Stockfish eval error:', err)
+    } finally {
+      if (fen.value === currentFen) {
+        isEngineEvaluating.value = false
+      }
+    }
+  }
+
+  // Watch FEN for real-time automatic evaluation
+  watch(fen, (newFen) => {
+    if (evalTimeout) clearTimeout(evalTimeout)
+    evalTimeout = setTimeout(() => {
+      triggerLiveEvaluation(newFen)
+    }, 120)
+  }, { immediate: true })
+
+  function setMultipv(n: number) {
+    multipv.value = n
+  }
+
+  // Watch MultiPV toggle
+  watch(multipv, () => {
+    triggerLiveEvaluation()
+  })
 
   /**
    * Runs automated Stockfish review on the entire loaded game
@@ -430,7 +511,6 @@ export function useChessGame() {
         }
       })
 
-      // Assign classifications to history items
       for (const m of res.moves) {
         const item = history.value[m.index]
         if (item) {
@@ -463,6 +543,10 @@ export function useChessGame() {
     currentMoveIndex,
     playedMove,
     engineEval,
+    evalLines,
+    multipv,
+    isEngineEvaluating,
+    autoEvaluate,
     isAnalyzing,
     isReviewing,
     reviewStats,
@@ -484,6 +568,9 @@ export function useChessGame() {
     nextMove,
     goToEnd,
     setBestMoveArrow,
+    setHoverArrow,
+    setMultipv,
+    triggerLiveEvaluation,
     runFullGameReview
   }
 }
