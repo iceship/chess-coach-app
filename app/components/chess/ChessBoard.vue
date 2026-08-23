@@ -26,8 +26,8 @@ function updateBoard() {
     : undefined
 
   const shapes = props.game.arrows.value.map(a => ({
-    orig: a.orig,
-    dest: a.dest,
+    orig: a.orig as Key,
+    dest: a.dest as Key,
     brush: a.brush
   }))
 
@@ -56,6 +56,12 @@ function initChessground() {
   const lastMove: Key[] | undefined = props.game.playedMove.value
     ? [props.game.playedMove.value.from as Key, props.game.playedMove.value.to as Key]
     : undefined
+
+  const shapes = props.game.arrows.value.map(a => ({
+    orig: a.orig as Key,
+    dest: a.dest as Key,
+    brush: a.brush
+  }))
 
   const config: Config = {
     fen: props.game.fen.value,
@@ -89,7 +95,7 @@ function initChessground() {
     drawable: {
       enabled: true,
       visible: true,
-      shapes: props.game.arrows.value
+      shapes
     }
   }
 

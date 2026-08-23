@@ -46,7 +46,7 @@ const matchInfo = computed(() => {
 </script>
 
 <template>
-  <div class="h-full flex flex-col overflow-y-auto bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 select-none">
+  <div class="h-full flex flex-col overflow-y-auto custom-scrollbar bg-white dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 select-none">
     <!-- Header -->
     <div class="flex items-center justify-between px-4 py-3 border-b border-neutral-200 dark:border-neutral-800 shrink-0">
       <div class="flex items-center gap-2">
@@ -58,7 +58,7 @@ const matchInfo = computed(() => {
 
       <div class="flex items-center gap-1">
         <UButton
-          v-if="game.history.value.length > 0"
+          v-if="game.mainHistory.value.length > 0"
           :loading="game.isReviewing.value"
           icon="i-lucide-sparkles"
           size="xs"
@@ -131,6 +131,26 @@ const matchInfo = computed(() => {
       </div>
     </div>
 
+    <!-- Active Variation Branch Banner (Chess.com Style) -->
+    <div
+      v-if="game.isVariation.value"
+      class="px-4 py-2 bg-amber-500/15 dark:bg-amber-500/20 border-b border-amber-500/30 flex items-center justify-between text-xs shrink-0"
+    >
+      <div class="flex items-center gap-2 font-medium text-amber-900 dark:text-amber-200">
+        <UIcon name="i-lucide-git-branch" class="text-amber-500 w-4 h-4 shrink-0" />
+        <span>대체 수순 탐색 중 (Variation Line)</span>
+        <span class="text-neutral-400 font-normal hidden sm:inline">• 원본 기보 보존됨</span>
+      </div>
+      <UButton
+        icon="i-lucide-play"
+        size="xs"
+        color="primary"
+        variant="solid"
+        label="본선 복귀 (Resume)"
+        @click="game.resumeMainLine()"
+      />
+    </div>
+
     <!-- Main board container (clean layout without nested scrollbars) -->
     <div class="flex-1 flex flex-col items-center p-2 gap-2 min-h-0">
       <!-- Chessboard with integrated vertical Eval Bar -->
@@ -154,7 +174,7 @@ const matchInfo = computed(() => {
         @open-pgn="pgnModalOpen = true"
       />
 
-      <!-- Move History List with Chess.com Annotation Badges -->
+      <!-- Move History List with Chess.com Style Variations -->
       <ChessMoveList :game="game" />
     </div>
 

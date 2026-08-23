@@ -2,6 +2,7 @@ import { Chess } from 'chess.js'
 import type { Key } from '@lichess-org/chessground/types'
 import type {
   BoardOrientation,
+  ChessArrowShape,
   ChessColor,
   ChessGameHeaders,
   EngineLine,
@@ -13,90 +14,58 @@ import type {
 
 const DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
-export const DEFAULT_CHESSCOM_PGN = `[Event "Live Chess"]
+const DEFAULT_CHESSCOM_PGN = `[Event "Live Chess"]
 [Site "Chess.com"]
-[Date "2026.08.21"]
+[Date "2026.04.14"]
 [Round "-"]
 [White "White"]
 [Black "Black"]
 [Result "1-0"]
-[CurrentPosition "r2q1rk1/1Qp1pp1p/p5p1/1p6/8/1BNP3P/P1P2PP1/R4RK1 b - - 0 16"]
-[Timezone "UTC"]
-[ECO "B07"]
 [WhiteElo "727"]
 [BlackElo "700"]
 [TimeControl "180+2"]
+[EndTime "16:21:40 PDT"]
 [Termination "White won by resignation"]
+[ECO "B07"]
 
-1. e4 {[%clk 0:03:01][%timestamp 10]} 1... d6 {[%clk 0:03:00.2][%timestamp 18]}
-2. Qf3 $6 {[%clk 0:03:00.9][%timestamp 21][%c_effect
-f3;square;f3;type;Inaccuracy;persistent;true]} 2... Nf6 {[%clk
-0:03:01.1][%timestamp 11]} 3. Bc4 {[%clk 0:03:01.3][%timestamp 16]} 3... g6
-{[%clk 0:03:01.6][%timestamp 15]} 4. h3 {[%clk 0:03:01.6][%timestamp 17]} 4...
-Bg7 {[%clk 0:03:02.8][%timestamp 8]} 5. d3 {[%clk 0:03:02.3][%timestamp 13]}
-5... O-O {[%clk 0:03:03.3][%timestamp 15]} 6. Nc3 {[%clk 0:03:02.6][%timestamp
-17]} 6... a6 {[%clk 0:02:47.5][%timestamp 178]} 7. Nge2 {[%clk
-0:03:02.8][%timestamp 18]} 7... b5 $2 {[%clk 0:02:48.1][%timestamp 14][%c_effect
-b5;square;b5;type;Mistake;persistent;true]} 8. Bb3 $9 {[%clk
-0:03:02.9][%timestamp 19]} 8... Bb7 {[%clk 0:02:45.1][%timestamp 50]} 9. Bg5
-{[%clk 0:03:00.6][%timestamp 43]} 9... d5 $2 {[%clk 0:02:32.3][%timestamp
-148][%c_effect d5;square;d5;type;Mistake;persistent;true]} 10. e5 {[%clk
-0:03:00.5][%timestamp 21]} 10... d4 $4 {[%clk 0:02:28.3][%timestamp 60][%c_effect
-d4;square;d4;type;Blunder;persistent;true]} 11. Qxb7 $1 {[%clk
-0:02:54.3][%timestamp 82][%c_effect
-b7;square;b7;type;GreatFind;persistent;true]} 11... dxc3 {[%clk
-0:02:16.1][%timestamp 142]} 12. bxc3 {[%clk 0:02:45.4][%timestamp 109]} 12...
-Nbd7 {[%clk 0:02:10][%timestamp 81]} 13. Bxf6 $9 {[%clk 0:02:44.2][%timestamp
-32]} 13... Nxf6 $9 {[%clk 0:02:07.4][%timestamp 46]} 14. exf6 {[%clk
-0:02:44.9][%timestamp 13]} 14... Bxf6 {[%clk 0:02:09.1][%timestamp 3]} 15. O-O
-{[%clk 0:02:42.9][%timestamp 40]} 15... Bxc3 $2 {[%clk 0:02:09.5][%timestamp
-16][%c_effect
-c3;square;c3;type;Mistake;size;100%25;animated;false;persistent;true]} 16. Nxc3
-{[%clk 0:02:43.4][%c_effect
-g1;square;g1;type;Winner;animated;true,g8;square;g8;type;ResignBlack;animated;true][%timestamp
-15]} 1-0`
-
-export interface ChessArrowShape {
-  orig: Key
-  dest: Key
-  brush: string
-}
-
-export interface ReviewStats {
-  whiteAccuracy: number
-  blackAccuracy: number
-  stats: {
-    white: Record<MoveClassification, number>
-    black: Record<MoveClassification, number>
-  }
-}
+1. e4 {[%clk 0:03:02]} 1... d6 {[%clk 0:03:00.6]} 2. d4 {[%clk 0:03:03.2]} 2... Nf6 {[%clk 0:03:01.3]} 3. Nc3 {[%clk 0:03:04.4]} 3... g6 {[%clk 0:03:01.9]} 4. Bg5 {[%clk 0:03:05.1]} 4... Bg7 {[%clk 0:03:02.8]} 5. e5 {[%clk 0:03:05.7]} 5... dxe5 {[%clk 0:03:02.3]} 6. dxe5 {[%clk 0:03:06.9]} 6... Qxd1+ {[%clk 0:03:00.6]} 7. Rxd1 {[%clk 0:03:08]} 7... Nfd7 {[%clk 0:02:59.3]} 8. Nd5 {[%clk 0:03:07.7]} 8... Bxe5 {[%clk 0:02:49.2]} 9. Nf3 {[%clk 0:03:02.6]} 9... Bd6 {[%clk 0:02:44.2]} 10. Bxe7 {[%clk 0:03:00.5]} 10... Bxe7 {[%clk 0:02:41.3]} 11. Nxc7+ {[%clk 0:03:00.7]} 11... Kd8 {[%clk 0:02:42.5]} 12. Nxa8 {[%clk 0:03:01.3]} 12... b6 {[%clk 0:02:42.2]} 13. Ne5 {[%clk 0:02:58.3]} 13... Rf8 {[%clk 0:02:30.9]} 14. Be2 {[%clk 0:02:40.4]} 14... b5 {[%clk 0:02:18.9]} 15. a3 {[%clk 0:02:27.7]} 15... Bxc3+ {[%clk 0:02:15.5]} 16. bxc3 {[%clk 0:02:28.9]} 16... Kc7 {[%clk 0:02:08.5]} 17. Nxd7 {[%clk 0:02:28.1]} 17... Nxd7 {[%clk 0:02:09.6]} 18. Bxb5 {[%clk 0:02:28.7]} 18... Nb6 {[%clk 0:02:09.1]} 19. O-O {[%clk 0:02:28.9]} 19... a6 {[%clk 0:02:09.1]} 20. Be2 {[%clk 0:02:27.1]} 20... f5 {[%clk 0:02:07.5]} 21. Rd4 {[%clk 0:02:26.5]} 21... Bb7 {[%clk 0:02:06.6]} 22. Rfd1 {[%clk 0:02:26.7]} 22... Re8 {[%clk 0:02:04.9]} 23. Bf1 {[%clk 0:02:26.7]} 23... Re7 {[%clk 0:02:02.1]} 24. a4 {[%clk 0:02:26.3]} 24... Bc6 {[%clk 0:01:54.6]} 25. a5 {[%clk 0:02:26.6]} 25... Nd7 {[%clk 0:01:46.4]} 26. Bxa6 {[%clk 0:02:26.8]} 26... Nc5 {[%clk 0:01:47]} 27. Bc4 {[%clk 0:02:26.8]} 27... Ne4 {[%clk 0:01:46.9]} 28. R4d3 {[%clk 0:02:26.6]} 28... Nc5 {[%clk 0:01:46.3]} 29. Re3 {[%clk 0:02:26.3]} 29... Ne4 {[%clk 0:01:44.2]} 30. f3 {[%clk 0:02:26.7]} 30... Rd7 {[%clk 0:01:31.9]} 31. Rxd7+ {[%clk 0:02:27.8]} 31... Kxd7 {[%clk 0:01:32.9]} 32. fxe4 {[%clk 0:02:28.9]} 32... Bxe4 {[%clk 0:01:33.7]} 33. Bd3 {[%clk 0:02:29.8]} 33... Bd5 {[%clk 0:01:34.4]} 34. c4 {[%clk 0:02:31.2]} 34... Bc6 {[%clk 0:01:34.9]} 35. c5 {[%clk 0:02:32.4]} 35... Kc7 {[%clk 0:01:35.3]} 36. Re7+ {[%clk 0:02:33.4]} 36... Kd8 {[%clk 0:01:36]} 37. Rxh7 {[%clk 0:02:34.4]} 37... Be8 {[%clk 0:01:35.5]} 38. a6 {[%clk 0:02:35.4]} 38... Bc6 {[%clk 0:01:35.9]} 39. a7 {[%clk 0:02:36.4]} 39... Kc8 {[%clk 0:01:35.2]} 40. Ba6+ {[%clk 0:02:37.4]} 40... Kd8 {[%clk 0:01:35.4]} 41. a8=Q+ {[%clk 0:02:38.4]} 41... Bxa8 {[%clk 0:01:35.7]} 42. Rh8+ {[%clk 0:02:39.4]} 42... Kc7 {[%clk 0:01:36.3]} 43. Rxa8 {[%clk 0:02:40.4]} 43... Kc6 {[%clk 0:01:37]} 44. Rc8+ {[%clk 0:02:41.4]} 44... Kd7 {[%clk 0:01:37.6]} 45. c6+ {[%clk 0:02:42.4]} 45... Kd6 {[%clk 0:01:38.2]} 46. Bb7 {[%clk 0:02:43.4]} 46... g5 {[%clk 0:01:38.8]} 47. Rd8+ {[%clk 0:02:44.4]} 47... Kc7 {[%clk 0:01:38.6]} 48. Rd7+ {[%clk 0:02:45.4]} 48... Kb8 {[%clk 0:01:38.9]} 49. Ba6 {[%clk 0:02:46.4]} 49... f4 {[%clk 0:01:39.1]} 50. c7+ {[%clk 0:02:47.4]} 50... Ka7 {[%clk 0:01:39.7]} 51. c8=Q+ {[%clk 0:02:48.4]} 51... Kb6 {[%clk 0:01:39.4]} 52. Qb7+ {[%clk 0:02:49.4]} 52... Ka5 {[%clk 0:01:39.3]} 53. Qb5# {[%clk 0:02:50.4]} 1-0`
 
 /**
- * Extracts NAG annotations ($1, $2, $4, $6, $9) and Chess.com effect comments from PGN.
+ * Parses Chess.com annotation comments (e.g. [%c_effect c3;type;best;...]) or standard NAGs
  */
-function extractMoveAnnotations(pgnText: string): Map<number, MoveClassification> {
-  const body = pgnText.replace(/\[[^\]]*\]/g, ' ')
-  const tokens = body.match(/\{[^}]*\}|\$[0-9]+|\d+\.+|[a-zA-Z0-9+=#-]+/g) || []
+function extractMoveAnnotations(pgn: string): Map<number, MoveClassification> {
   const map = new Map<number, MoveClassification>()
+  if (!pgn) return map
+
+  const cleaned = pgn.replace(/\[.*?\]/g, ' ')
+  const tokens = cleaned.split(/\s+/)
   let moveIdx = -1
 
-  for (const token of tokens) {
-    if (/^\d+\.+$/.test(token)) continue
-    if (/^(1-0|0-1|1\/2-1\/2|\*)$/.test(token)) continue
+  for (let i = 0; i < tokens.length; i++) {
+    const raw = tokens[i]
+    if (!raw) continue
+    const token = raw.trim()
 
+    // Skip move numbers e.g. "1." or "1..."
+    if (/^\d+\.+$/.test(token)) continue
+
+    // Standard NAGs
     if (token.startsWith('$')) {
-      if (moveIdx >= 0 && !map.has(moveIdx)) {
-        if (token === '$1') map.set(moveIdx, 'best')
-        else if (token === '$2') map.set(moveIdx, 'mistake')
-        else if (token === '$3') map.set(moveIdx, 'brilliant')
-        else if (token === '$4') map.set(moveIdx, 'blunder')
-        else if (token === '$6') map.set(moveIdx, 'inaccuracy')
-        else if (token === '$9') map.set(moveIdx, 'missed_win')
+      const nag = token.slice(1)
+      if (moveIdx >= 0) {
+        if (nag === '1') map.set(moveIdx, 'good')
+        else if (nag === '2') map.set(moveIdx, 'mistake')
+        else if (nag === '3') map.set(moveIdx, 'brilliant')
+        else if (nag === '4') map.set(moveIdx, 'blunder')
+        else if (nag === '5') map.set(moveIdx, 'best')
+        else if (nag === '6') map.set(moveIdx, 'inaccuracy')
+        else if (nag === '9') map.set(moveIdx, 'best')
       }
       continue
     }
 
-    if (token.startsWith('{')) {
+    // Chess.com effect annotation comments: {[%c_effect ...;type;...]}
+    if (token.includes('{') || token.includes('}')) {
       if (moveIdx >= 0 && token.includes('type;')) {
         const typeMatch = token.match(/type;([a-zA-Z0-9]+)/)
         if (typeMatch && typeMatch[1]) {
@@ -119,11 +88,38 @@ function extractMoveAnnotations(pgnText: string): Map<number, MoveClassification
   return map
 }
 
+export interface ReviewStats {
+  whiteAccuracy: number
+  blackAccuracy: number
+  stats: {
+    white: Partial<Record<MoveClassification, number>>
+    black: Partial<Record<MoveClassification, number>>
+  }
+}
+
 export function useChessGame() {
   const chess = shallowRef(new Chess())
   const fen = ref(DEFAULT_FEN)
   const orientation = ref<BoardOrientation>('white')
-  const history = ref<MoveHistoryItem[]>([])
+
+  // Main line history (preserves the original complete game)
+  const mainHistory = ref<MoveHistoryItem[]>([])
+
+  // Variation history (for what-if exploration without deleting the main game)
+  const variationHistory = ref<MoveHistoryItem[]>([])
+  const variationBranchIndex = ref<number>(-1)
+
+  const isVariation = computed(() => variationBranchIndex.value !== -1)
+
+  // Combined active history
+  const history = computed<MoveHistoryItem[]>(() => {
+    if (!isVariation.value) return mainHistory.value
+    return [
+      ...mainHistory.value.slice(0, variationBranchIndex.value + 1),
+      ...variationHistory.value
+    ]
+  })
+
   const currentMoveIndex = ref<number>(-1)
   const headers = ref<ChessGameHeaders>({})
   const engineEval = ref<StockfishEvalResult | null>(null)
@@ -163,10 +159,11 @@ export function useChessGame() {
   })
 
   const playedMove = computed<PlayedMoveInfo | null>(() => {
-    if (currentMoveIndex.value < 0 || currentMoveIndex.value >= history.value.length) {
+    const list = history.value
+    if (currentMoveIndex.value < 0 || currentMoveIndex.value >= list.length) {
       return null
     }
-    const item = history.value[currentMoveIndex.value]
+    const item = list[currentMoveIndex.value]
     if (!item) return null
 
     return {
@@ -181,17 +178,18 @@ export function useChessGame() {
       moveNumber: item.moveNumber,
       beforeFen: item.beforeFen,
       afterFen: item.afterFen,
-      eval: item.eval,
-      classification: item.classification
+      classification: item.classification,
+      eval: item.eval
     }
   })
 
   /**
-   * Generates a legal move destination map for Chessground
+   * Returns legal destination squares for the current board position
    */
   function getDests(): Map<Key, Key[]> {
     const dests = new Map<Key, Key[]>()
     const moves = chess.value.moves({ verbose: true })
+
     for (const move of moves) {
       const from = move.from as Key
       const to = move.to as Key
@@ -204,7 +202,8 @@ export function useChessGame() {
   }
 
   /**
-   * Makes a move on the board (via drag-and-drop or programmatic input)
+   * Makes a move on the board (via drag-and-drop or programmatic input).
+   * If in review mode and a different move is made, branches into a Variation without deleting the original game.
    */
   function makeMove(moveObj: { from: string, to: string, promotion?: string }): boolean {
     try {
@@ -220,7 +219,6 @@ export function useChessGame() {
       const afterFen = chess.value.fen()
       fen.value = afterFen
 
-      // Determine move number
       const moveCount = chess.value.moveNumber()
       const moveTurn: ChessColor = moveResult.color
 
@@ -239,23 +237,60 @@ export function useChessGame() {
         afterFen
       }
 
-      // If user moved from an earlier point in history, truncate remaining moves
-      if (currentMoveIndex.value < history.value.length - 1) {
-        history.value = history.value.slice(0, currentMoveIndex.value + 1)
+      if (isVariation.value) {
+        // Already in a variation branch: continue extending this variation
+        const branchOffset = currentMoveIndex.value - variationBranchIndex.value
+        if (branchOffset < variationHistory.value.length) {
+          variationHistory.value = variationHistory.value.slice(0, branchOffset)
+        }
+        historyItem.index = variationBranchIndex.value + 1 + variationHistory.value.length
+        variationHistory.value.push(historyItem)
+        currentMoveIndex.value = history.value.length - 1
+      } else {
+        // In main line mode
+        if (currentMoveIndex.value === mainHistory.value.length - 1) {
+          // At the end of the game: simply append to main line
+          historyItem.index = mainHistory.value.length
+          mainHistory.value.push(historyItem)
+          currentMoveIndex.value = mainHistory.value.length - 1
+        } else {
+          // Exploring from an earlier move in the game!
+          const nextMainMove = mainHistory.value[currentMoveIndex.value + 1]
+          if (nextMainMove && nextMainMove.san === moveResult.san) {
+            // Player repeated the exact same move as the main game: advance in main line
+            currentMoveIndex.value = currentMoveIndex.value + 1
+          } else {
+            // Player made an alternative / what-if move:
+            // Branch into a Variation tree without losing the main line!
+            variationBranchIndex.value = currentMoveIndex.value
+            historyItem.index = currentMoveIndex.value + 1
+            variationHistory.value = [historyItem]
+            currentMoveIndex.value = currentMoveIndex.value + 1
+          }
+        }
       }
 
-      history.value.push(historyItem)
-      currentMoveIndex.value = history.value.length - 1
-
-      // Reset arrows
       bestMoveArrow.value = null
       hoverArrow.value = null
-
       return true
     } catch (err) {
       console.warn('Illegal or invalid move:', err)
       return false
     }
+  }
+
+  /**
+   * Resumes back to the main game line from a variation branch
+   */
+  function resumeMainLine(targetIndex?: number) {
+    if (!isVariation.value) return
+    const restoreIdx = targetIndex !== undefined
+      ? targetIndex
+      : Math.min(variationBranchIndex.value + 1, mainHistory.value.length - 1)
+
+    variationBranchIndex.value = -1
+    variationHistory.value = []
+    goToMove(restoreIdx)
   }
 
   /**
@@ -322,7 +357,9 @@ export function useChessGame() {
         })
       }
 
-      history.value = parsedItems
+      mainHistory.value = parsedItems
+      variationHistory.value = []
+      variationBranchIndex.value = -1
       reviewStats.value = null
       goToEnd()
       return { success: true }
@@ -338,28 +375,33 @@ export function useChessGame() {
    */
   function loadFen(fenString: string): boolean {
     try {
-      chess.value = new Chess(fenString)
+      const tempChess = new Chess(fenString)
+      chess.value = tempChess
       fen.value = fenString
-      history.value = []
+      mainHistory.value = []
+      variationHistory.value = []
+      variationBranchIndex.value = -1
+      currentMoveIndex.value = -1
       headers.value = {}
       reviewStats.value = null
-      currentMoveIndex.value = -1
       bestMoveArrow.value = null
       hoverArrow.value = null
       return true
     } catch (err) {
-      console.error('Invalid FEN:', err)
+      console.warn('Failed to load FEN:', err)
       return false
     }
   }
 
   /**
-   * Resets board to initial game position
+   * Resets the entire chessboard to the starting position
    */
   function resetGame() {
     chess.value = new Chess()
     fen.value = DEFAULT_FEN
-    history.value = []
+    mainHistory.value = []
+    variationHistory.value = []
+    variationBranchIndex.value = -1
     headers.value = {}
     reviewStats.value = null
     currentMoveIndex.value = -1
@@ -379,7 +421,8 @@ export function useChessGame() {
    * Navigates to a specific move index in history (-1 = start position)
    */
   function goToMove(index: number) {
-    if (index < -1 || index >= history.value.length) return
+    const list = history.value
+    if (index < -1 || index >= list.length) return
 
     currentMoveIndex.value = index
 
@@ -387,7 +430,7 @@ export function useChessGame() {
       chess.value = new Chess()
       fen.value = DEFAULT_FEN
     } else {
-      const item = history.value[index]
+      const item = list[index]
       if (item) {
         chess.value = new Chess(item.afterFen)
         fen.value = item.afterFen
@@ -396,6 +439,17 @@ export function useChessGame() {
 
     bestMoveArrow.value = null
     hoverArrow.value = null
+  }
+
+  /**
+   * Jumps to a specific move in the main line (exiting any variation)
+   */
+  function goToMainMove(index: number) {
+    if (isVariation.value) {
+      variationBranchIndex.value = -1
+      variationHistory.value = []
+    }
+    goToMove(index)
   }
 
   function goToStart() {
@@ -451,22 +505,22 @@ export function useChessGame() {
 
   async function triggerLiveEvaluation(targetFen?: string) {
     const currentFen = targetFen || fen.value
-    if (!autoEvaluate.value) return
+    if (!currentFen || currentFen === 'start') return
 
     isEngineEvaluating.value = true
     try {
-      const res = await $fetch<{ eval: StockfishEvalResult }>('/api/coach/eval', {
+      const res = await $fetch<StockfishEvalResult>(`/api/coach/eval`, {
         params: {
           fen: currentFen,
           depth: 16,
-          multipv: multipv.value
+          multipv: multipv.value || 2
         }
       })
 
       if (fen.value === currentFen) {
-        engineEval.value = res.eval
-        if (res.eval.bestmove) {
-          setBestMoveArrow(res.eval.bestmove)
+        engineEval.value = res
+        if (res.bestmove) {
+          setBestMoveArrow(res.bestmove)
         }
       }
     } catch (err) {
@@ -499,7 +553,7 @@ export function useChessGame() {
    * Runs automated Stockfish review on the entire loaded game
    */
   async function runFullGameReview() {
-    if (history.value.length === 0 || isReviewing.value) return
+    if (mainHistory.value.length === 0 || isReviewing.value) return
 
     isReviewing.value = true
     try {
@@ -507,12 +561,12 @@ export function useChessGame() {
         method: 'POST',
         headers: { [headerName]: csrf },
         body: {
-          history: history.value
+          history: mainHistory.value
         }
       })
 
       for (const m of res.moves) {
-        const item = history.value[m.index]
+        const item = mainHistory.value[m.index]
         if (item) {
           item.classification = m.classification
           item.eval = m.eval
@@ -539,6 +593,10 @@ export function useChessGame() {
     fen,
     orientation,
     history,
+    mainHistory,
+    variationHistory,
+    variationBranchIndex,
+    isVariation,
     headers,
     currentMoveIndex,
     playedMove,
@@ -558,11 +616,13 @@ export function useChessGame() {
     isGameOver,
     getDests,
     makeMove,
+    resumeMainLine,
     loadPgn,
     loadFen,
     resetGame,
     flipBoard,
     goToMove,
+    goToMainMove,
     goToStart,
     prevMove,
     nextMove,

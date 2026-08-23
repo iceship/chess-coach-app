@@ -5,6 +5,12 @@
 export type ChessColor = 'w' | 'b'
 export type BoardOrientation = 'white' | 'black'
 
+export interface ChessArrowShape {
+  orig: string
+  dest: string
+  brush: string
+}
+
 export type MoveClassification
   = | 'brilliant'
     | 'best'
