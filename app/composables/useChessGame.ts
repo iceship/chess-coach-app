@@ -16,19 +16,44 @@ const DEFAULT_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
 const DEFAULT_CHESSCOM_PGN = `[Event "Live Chess"]
 [Site "Chess.com"]
-[Date "2026.04.14"]
+[Date "2026.08.21"]
 [Round "-"]
 [White "White"]
 [Black "Black"]
 [Result "1-0"]
+[ECO "B07"]
 [WhiteElo "727"]
 [BlackElo "700"]
 [TimeControl "180+2"]
-[EndTime "16:21:40 PDT"]
 [Termination "White won by resignation"]
-[ECO "B07"]
 
-1. e4 {[%clk 0:03:02]} 1... d6 {[%clk 0:03:00.6]} 2. d4 {[%clk 0:03:03.2]} 2... Nf6 {[%clk 0:03:01.3]} 3. Nc3 {[%clk 0:03:04.4]} 3... g6 {[%clk 0:03:01.9]} 4. Bg5 {[%clk 0:03:05.1]} 4... Bg7 {[%clk 0:03:02.8]} 5. e5 {[%clk 0:03:05.7]} 5... dxe5 {[%clk 0:03:02.3]} 6. dxe5 {[%clk 0:03:06.9]} 6... Qxd1+ {[%clk 0:03:00.6]} 7. Rxd1 {[%clk 0:03:08]} 7... Nfd7 {[%clk 0:02:59.3]} 8. Nd5 {[%clk 0:03:07.7]} 8... Bxe5 {[%clk 0:02:49.2]} 9. Nf3 {[%clk 0:03:02.6]} 9... Bd6 {[%clk 0:02:44.2]} 10. Bxe7 {[%clk 0:03:00.5]} 10... Bxe7 {[%clk 0:02:41.3]} 11. Nxc7+ {[%clk 0:03:00.7]} 11... Kd8 {[%clk 0:02:42.5]} 12. Nxa8 {[%clk 0:03:01.3]} 12... b6 {[%clk 0:02:42.2]} 13. Ne5 {[%clk 0:02:58.3]} 13... Rf8 {[%clk 0:02:30.9]} 14. Be2 {[%clk 0:02:40.4]} 14... b5 {[%clk 0:02:18.9]} 15. a3 {[%clk 0:02:27.7]} 15... Bxc3+ {[%clk 0:02:15.5]} 16. bxc3 {[%clk 0:02:28.9]} 16... Kc7 {[%clk 0:02:08.5]} 17. Nxd7 {[%clk 0:02:28.1]} 17... Nxd7 {[%clk 0:02:09.6]} 18. Bxb5 {[%clk 0:02:28.7]} 18... Nb6 {[%clk 0:02:09.1]} 19. O-O {[%clk 0:02:28.9]} 19... a6 {[%clk 0:02:09.1]} 20. Be2 {[%clk 0:02:27.1]} 20... f5 {[%clk 0:02:07.5]} 21. Rd4 {[%clk 0:02:26.5]} 21... Bb7 {[%clk 0:02:06.6]} 22. Rfd1 {[%clk 0:02:26.7]} 22... Re8 {[%clk 0:02:04.9]} 23. Bf1 {[%clk 0:02:26.7]} 23... Re7 {[%clk 0:02:02.1]} 24. a4 {[%clk 0:02:26.3]} 24... Bc6 {[%clk 0:01:54.6]} 25. a5 {[%clk 0:02:26.6]} 25... Nd7 {[%clk 0:01:46.4]} 26. Bxa6 {[%clk 0:02:26.8]} 26... Nc5 {[%clk 0:01:47]} 27. Bc4 {[%clk 0:02:26.8]} 27... Ne4 {[%clk 0:01:46.9]} 28. R4d3 {[%clk 0:02:26.6]} 28... Nc5 {[%clk 0:01:46.3]} 29. Re3 {[%clk 0:02:26.3]} 29... Ne4 {[%clk 0:01:44.2]} 30. f3 {[%clk 0:02:26.7]} 30... Rd7 {[%clk 0:01:31.9]} 31. Rxd7+ {[%clk 0:02:27.8]} 31... Kxd7 {[%clk 0:01:32.9]} 32. fxe4 {[%clk 0:02:28.9]} 32... Bxe4 {[%clk 0:01:33.7]} 33. Bd3 {[%clk 0:02:29.8]} 33... Bd5 {[%clk 0:01:34.4]} 34. c4 {[%clk 0:02:31.2]} 34... Bc6 {[%clk 0:01:34.9]} 35. c5 {[%clk 0:02:32.4]} 35... Kc7 {[%clk 0:01:35.3]} 36. Re7+ {[%clk 0:02:33.4]} 36... Kd8 {[%clk 0:01:36]} 37. Rxh7 {[%clk 0:02:34.4]} 37... Be8 {[%clk 0:01:35.5]} 38. a6 {[%clk 0:02:35.4]} 38... Bc6 {[%clk 0:01:35.9]} 39. a7 {[%clk 0:02:36.4]} 39... Kc8 {[%clk 0:01:35.2]} 40. Ba6+ {[%clk 0:02:37.4]} 40... Kd8 {[%clk 0:01:35.4]} 41. a8=Q+ {[%clk 0:02:38.4]} 41... Bxa8 {[%clk 0:01:35.7]} 42. Rh8+ {[%clk 0:02:39.4]} 42... Kc7 {[%clk 0:01:36.3]} 43. Rxa8 {[%clk 0:02:40.4]} 43... Kc6 {[%clk 0:01:37]} 44. Rc8+ {[%clk 0:02:41.4]} 44... Kd7 {[%clk 0:01:37.6]} 45. c6+ {[%clk 0:02:42.4]} 45... Kd6 {[%clk 0:01:38.2]} 46. Bb7 {[%clk 0:02:43.4]} 46... g5 {[%clk 0:01:38.8]} 47. Rd8+ {[%clk 0:02:44.4]} 47... Kc7 {[%clk 0:01:38.6]} 48. Rd7+ {[%clk 0:02:45.4]} 48... Kb8 {[%clk 0:01:38.9]} 49. Ba6 {[%clk 0:02:46.4]} 49... f4 {[%clk 0:01:39.1]} 50. c7+ {[%clk 0:02:47.4]} 50... Ka7 {[%clk 0:01:39.7]} 51. c8=Q+ {[%clk 0:02:48.4]} 51... Kb6 {[%clk 0:01:39.4]} 52. Qb7+ {[%clk 0:02:49.4]} 52... Ka5 {[%clk 0:01:39.3]} 53. Qb5# {[%clk 0:02:50.4]} 1-0`
+1. e4 {[%clk 0:03:01][%timestamp 10]} 1... d6 {[%clk 0:03:00.2][%timestamp 18]}
+2. Qf3 $6 {[%clk 0:03:00.9][%timestamp 21][%c_effect
+f3;square;f3;type;Inaccuracy;persistent;true]} 2... Nf6 {[%clk
+0:03:01.1][%timestamp 11]} 3. Bc4 {[%clk 0:03:01.3][%timestamp 16]} 3... g6
+{[%clk 0:03:01.6][%timestamp 15]} 4. h3 {[%clk 0:03:01.6][%timestamp 17]} 4...
+Bg7 {[%clk 0:03:02.8][%timestamp 8]} 5. d3 {[%clk 0:03:02.3][%timestamp 13]}
+5... O-O {[%clk 0:03:03.3][%timestamp 15]} 6. Nc3 {[%clk 0:03:02.6][%timestamp
+17]} 6... a6 {[%clk 0:02:47.5][%timestamp 178]} 7. Nge2 {[%clk
+0:03:02.8][%timestamp 18]} 7... b5 $2 {[%clk 0:02:48.1][%timestamp 14][%c_effect
+b5;square;b5;type;Mistake;persistent;true]} 8. Bb3 $9 {[%clk
+0:03:02.9][%timestamp 19]} 8... Bb7 {[%clk 0:02:45.1][%timestamp 50]} 9. Bg5
+{[%clk 0:03:00.6][%timestamp 43]} 9... d5 $2 {[%clk 0:02:32.3][%timestamp
+148][%c_effect d5;square;d5;type;Mistake;persistent;true]} 10. e5 {[%clk
+0:03:00.5][%timestamp 21]} 10... d4 $4 {[%clk 0:02:28.3][%timestamp 60][%c_effect
+d4;square;d4;type;Blunder;persistent;true]} 11. Qxb7 $1 {[%clk
+0:02:54.3][%timestamp 82][%c_effect
+b7;square;b7;type;GreatFind;persistent;true]} 11... dxc3 {[%clk
+0:02:16.1][%timestamp 142]} 12. bxc3 {[%clk 0:02:45.4][%timestamp 109]} 12...
+Nbd7 {[%clk 0:02:10][%timestamp 81]} 13. Bxf6 $9 {[%clk 0:02:44.2][%timestamp
+32]} 13... Nxf6 $9 {[%clk 0:02:07.4][%timestamp 46]} 14. exf6 {[%clk
+0:02:44.9][%timestamp 13]} 14... Bxf6 {[%clk 0:02:09.1][%timestamp 3]} 15. O-O
+{[%clk 0:02:42.9][%timestamp 40]} 15... Bxc3 $2 {[%clk 0:02:09.5][%timestamp
+16][%c_effect
+c3;square;c3;type;Mistake;size;100%25;animated;false;persistent;true]} 16. Nxc3
+{[%clk 0:02:43.4][%c_effect
+g1;square;g1;type;Winner;animated;true,g8;square;g8;type;ResignBlack;animated;true][%timestamp
+15]} 1-0`
 
 /**
  * Parses Chess.com annotation comments (e.g. [%c_effect c3;type;best;...]) or standard NAGs
@@ -509,7 +534,7 @@ export function useChessGame() {
 
     isEngineEvaluating.value = true
     try {
-      const res = await $fetch<StockfishEvalResult>(`/api/coach/eval`, {
+      const res = await $fetch<StockfishEvalResult & { eval?: StockfishEvalResult }>(`/api/coach/eval`, {
         params: {
           fen: currentFen,
           depth: 16,
@@ -517,10 +542,11 @@ export function useChessGame() {
         }
       })
 
-      if (fen.value === currentFen) {
-        engineEval.value = res
-        if (res.bestmove) {
-          setBestMoveArrow(res.bestmove)
+      if (fen.value === currentFen && res) {
+        const evalData: StockfishEvalResult = (res.eval || res) as StockfishEvalResult
+        engineEval.value = evalData
+        if (evalData.bestmove) {
+          setBestMoveArrow(evalData.bestmove)
         }
       }
     } catch (err) {

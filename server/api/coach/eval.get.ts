@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     return {
       fen: query.fen,
-      eval: evalResult
+      ...evalResult
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Stockfish evaluation failed'

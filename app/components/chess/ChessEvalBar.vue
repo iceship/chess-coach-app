@@ -11,11 +11,11 @@ const props = defineProps<{
  * Calculates the percentage height for the White side of the eval bar (0% - 100%).
  */
 const whiteHeightPercent = computed(() => {
-  if (!props.engineEval) return 50
+  if (!props.engineEval || !props.engineEval.score) return 50
 
   const { score, whiteScoreCp, winChance } = props.engineEval
 
-  if (score.type === 'mate') {
+  if (score?.type === 'mate') {
     if (score.value > 0) {
       // White has mate in N
       return 100
@@ -47,8 +47,8 @@ const bottomHeightPercent = computed(() => {
  * Determines which side (White or Black) is currently leading
  */
 const isWhiteLeading = computed(() => {
-  if (!props.engineEval) return true
-  if (props.engineEval.score.type === 'mate') {
+  if (!props.engineEval || !props.engineEval.score) return true
+  if (props.engineEval.score?.type === 'mate') {
     return props.engineEval.score.value > 0
   }
   return (props.engineEval.whiteScoreCp ?? 0) >= 0
