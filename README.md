@@ -1,10 +1,10 @@
 # ♟️ AI Chess Coach (의도 분석 대화형 AI 체스 코치)
 
 [![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
-[![Stockfish](https://img.shields.io/badge/Engine-Stockfish%2018-black?logo=chess.com)](https://stockfishchess.org/)
-[![Ollama](https://img.shields.io/badge/LLM-Gemma%204%20(Ollama)-orange)](https://ollama.com/)
+[![Stockfish](https://img.shields.io/badge/Engine-Stockfish%2019-black?logo=chess.com)](https://stockfishchess.org/)
+[![Ollama](https://img.shields.io/badge/LLM-Qwen%203.8%20(Ollama)-orange)](https://ollama.com/)
 
-**AI Chess Coach**는 체스 플레이어의 착상과 심리적 의도를 분석하고, 강력한 체스 엔진(Stockfish)의 정밀한 계산과 로컬 LLM(Ollama / Gemma 4)의 친절한 그랜드마스터 코칭을 결합한 **대화형 AI 체스 코칭 웹 애플리케이션**입니다.
+**AI Chess Coach**는 체스 플레이어의 착상과 심리적 의도를 분석하고, 강력한 체스 엔진(Stockfish)의 정밀한 계산과 로컬 LLM(Ollama / Qwen 3.8)의 친절한 그랜드마스터 코칭을 결합한 **대화형 AI 체스 코칭 웹 애플리케이션**입니다.
 
 > 💡 This project is built upon the official [Nuxt AI Chatbot Template](https://github.com/nuxt-ui-templates/chat).
 
@@ -35,8 +35,8 @@ sequenceDiagram
     actor User as 사용자 (User)
     participant Client as Frontend (Nuxt 4 + Chessground)
     participant Server as Nitro Server (/api/coach/analyze)
-    participant Engine as Stockfish 18 (Local Process)
-    participant LLM as Ollama (gemma4:e4b-mlx)
+    participant Engine as Stockfish 19 (Local Process)
+    participant LLM as Ollama (qwen3.8:27b-mlx)
 
     User->>Client: 기물 이동 / PGN 로드 후 질문 전송
     Client->>Server: POST /api/coach/analyze (FEN, playedMove, userQuestion, history)
@@ -124,7 +124,7 @@ pnpm preview
 ## 🛠️ 기술 스택 (Tech Stack)
 
 - **Frontend**: Nuxt 4, Vue 3, Nuxt UI v4, Tailwind CSS, `@lichess-org/chessground`, `chess.js`
-- **Backend / Engine**: Nitro (Server Engine), Stockfish 18 C++ Engine (Native Subprocess / MultiPV 2~3 Analysis)
+- **Backend / Engine**: Nitro (Server Engine), Stockfish 19 C++ Engine (Native Subprocess / MultiPV 2~3 Analysis)
 - **AI / LLM**: Ollama (`qwen3.8:27b-mlx`), Server-Sent Events (SSE) Streaming
 - **Icons & Markdown**: Nuxt Icon, `@comark/nuxt`, Shiki
 
@@ -132,4 +132,4 @@ pnpm preview
 
 ## 👏 Acknowledgments & Credits
 
-This project was built upon the [Nuxt AI Chatbot Template](https://github.com/nuxt-ui-templates/chat) by the Nuxt UI team, extending it with interactive chess board integration ([Chessground](https://github.com/lichess-org/chessground), [chess.js](https://github.com/jhlywa/chess.js)), local Stockfish 18 engine analysis, and local Ollama coaching capabilities.
+This project was built upon the [Nuxt AI Chatbot Template](https://github.com/nuxt-ui-templates/chat) by the Nuxt UI team, extending it with interactive chess board integration ([Chessground](https://github.com/lichess-org/chessground), [chess.js](https://github.com/jhlywa/chess.js)), local Stockfish 19 engine analysis, and local Ollama coaching capabilities.
