@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { ChessColor, EngineSummaryData, MoveClassification, StockfishEvalResult } from '~~/shared/types/chess'
 import { classifyMove, convertPvToSan, convertUciToSan, runStockfishAnalysis } from '~~/server/utils/stockfish'
-import { buildCoachPrompt, streamOllamaChat } from '~~/server/utils/ollama'
+import { DEFAULT_OLLAMA_URL, buildCoachPrompt, streamOllamaChat } from '~~/server/utils/ollama'
 
 const analyzeRequestSchema = z.object({
   fen: z.string().min(1),
@@ -105,7 +105,7 @@ export default defineEventHandler(async (event) => {
   // If streaming is not requested, return complete JSON
   if (!body.stream) {
     try {
-      const ollamaResponse = await fetch('http://localhost:11434/api/chat', {
+      const ollamaResponse = await fetch(`${DEFAULT_OLLAMA_URL}/v1/chat/completions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -114,14 +114,15 @@ export default defineEventHandler(async (event) => {
             { role: 'system', content: systemInstructions },
             { role: 'user', content: promptContent }
           ],
-          stream: false
+          stream: false,
+          max_tokens: 8192
         })
       })
 
       const json = await ollamaResponse.json()
       return {
         engineSummary,
-        coachExplanation: json.message?.content || ''
+        coachExplanation: json.choices?.[0]?.message?.content || ''
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'AI Coach generation error'
@@ -176,21 +177,23 @@ export default defineEventHandler(async (event) => {
 
           for (const line of lines) {
             const trimmed = line.trim()
-            if (!trimmed) continue
+            if (!trimmed.startsWith('data:')) continue
+
+            const data = trimmed.slice(5).trim()
+            if (data === '[DONE]') {
+              const doneEvent = `event: done\ndata: {}\n\n`
+              controller.enqueue(encoder.encode(doneEvent))
+              controller.close()
+              return
+            }
 
             try {
-              const parsed = JSON.parse(trimmed)
-              const chunkText = parsed.message?.content || ''
+              const parsed = JSON.parse(data)
+              // Only stream the visible answer; hidden reasoning_content stays out of the UI
+              const chunkText = parsed.choices?.[0]?.delta?.content || ''
               if (chunkText) {
                 const sseChunk = `event: chunk\ndata: ${JSON.stringify({ text: chunkText })}\n\n`
                 controller.enqueue(encoder.encode(sseChunk))
-              }
-
-              if (parsed.done) {
-                const doneEvent = `event: done\ndata: {}\n\n`
-                controller.enqueue(encoder.encode(doneEvent))
-                controller.close()
-                return
               }
             } catch {
               // ignore malformed JSON chunk

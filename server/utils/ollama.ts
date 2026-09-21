@@ -1,6 +1,6 @@
 import type { ChessColor, EngineSummaryData, MoveClassification } from '~~/shared/types/chess'
 
-const DEFAULT_OLLAMA_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
+export const DEFAULT_OLLAMA_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434'
 const DEFAULT_OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'qwen3.8:27b-mlx'
 
 export interface CoachPromptPayload {
@@ -112,7 +112,9 @@ ${topLinesText ? `[추천 라인 목록]\n${topLinesText}\n` : ''}${moveContextB
 }
 
 /**
- * Streams AI Coach response from Ollama with generous token buffer.
+ * Streams AI Coach response via the OpenAI-compatible /v1/chat/completions endpoint.
+ * Works with both Ollama and Splash. (Buffer is generous: reasoning models spend
+ * tokens on hidden thinking before the visible answer.)
  */
 export async function streamOllamaChat(
   messages: Array<{ role: 'system' | 'user' | 'assistant', content: string }>,
@@ -121,18 +123,16 @@ export async function streamOllamaChat(
   const baseUrl = options?.baseUrl || DEFAULT_OLLAMA_URL
   const model = options?.model || DEFAULT_OLLAMA_MODEL
 
-  const response = await fetch(`${baseUrl}/api/chat`, {
+  const response = await fetch(`${baseUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model,
       messages,
       stream: true,
-      options: {
-        temperature: 0.6,
-        top_p: 0.9,
-        num_predict: 4096
-      }
+      temperature: 0.6,
+      top_p: 0.9,
+      max_tokens: 8192
     }),
     signal: options?.signal
   })

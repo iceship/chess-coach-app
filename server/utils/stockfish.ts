@@ -159,6 +159,21 @@ export async function runStockfishAnalysis(
         const trimmed = line.trim()
         if (!trimmed) continue
 
+        // Engine hard error (e.g. invalid FEN) — fail fast instead of hanging until timeout
+        if (trimmed.includes('CRITICAL ERROR')) {
+          if (!resolved) {
+            resolved = true
+            clearTimeout(timer)
+            try {
+              sfProcess?.kill()
+            } catch {
+              // ignore
+            }
+            reject(new Error(trimmed.replace('info string ', '').replace('CRITICAL ERROR: ', '').slice(0, 200)))
+          }
+          continue
+        }
+
         // Match info depth ... multipv X score ... pv ...
         if (trimmed.startsWith('info ') && trimmed.includes(' score ') && trimmed.includes(' pv ')) {
           const depthMatch = trimmed.match(/\bdepth (\d+)\b/)
